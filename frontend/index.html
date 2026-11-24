@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biblioteca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand">Biblioteca</div>
+      <span class="user" id="who" hidden></span>
+      <button class="btn ghost" id="btnNew" hidden>Agregar libro</button>
+      <button class="btn ghost" id="btnLogin">Iniciar sesión</button>
+      <button class="btn ghost" id="btnLogout" hidden>Cerrar sesión</button>
+    </div>
+    <div class="hero">
+      <h1>Encuentra tu próxima lectura</h1>
+      <form class="search" id="sf" role="search">
+        <input id="q" type="search" placeholder="Busca por título o ISBN" aria-label="Buscar libros" autocomplete="off">
+        <button class="btn" style="background:var(--acc)">Buscar</button>
+      </form>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="chips" id="chips" aria-label="Categorías"></div>
+  <div class="count" id="count" aria-live="polite"></div>
+  <div class="grid" id="grid"></div>
+  <button class="btn line more" id="more" hidden>Mostrar más libros</button>
+</main>
+
+<!-- Detalle -->
+<dialog class="sheet" id="detail" aria-label="Detalle del libro">
+  <div class="in" id="detailBody"></div>
+</dialog>
+
+<!-- Acceso: iniciar sesión y crear cuenta -->
+<dialog class="modal" id="authD" aria-label="Acceso a la biblioteca">
+  <div class="in">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tabLogin" data-tab="login" aria-selected="true">Iniciar sesión</button>
+      <button class="tab" role="tab" id="tabReg" data-tab="reg" aria-selected="false">Crear cuenta</button>
+    </div>
+    <form class="stack" id="loginF">
+      <div><label for="em">Correo</label><input id="em" type="email" required autocomplete="username"></div>
+      <div><label for="pw">Contraseña</label><input id="pw" type="password" required autocomplete="current-password"></div>
+      <div class="err" id="loginErr" role="alert"></div>
+      <div class="acts" style="margin:0"><button class="btn" id="loginGo">Entrar</button><button class="btn line" type="button" data-close>Cancelar</button></div>
+    </form>
+    <form class="stack" id="regF" hidden>
+      <div><label for="rn">Nombre completo</label><input id="rn" type="text" required minlength="3" maxlength="100" autocomplete="name"></div>
+      <div><label for="re">Correo</label><input id="re" type="email" required autocomplete="email"></div>
+      <div><label for="rt">Teléfono (opcional)</label><input id="rt" type="text" inputmode="tel" pattern="[0-9\s+]{7,15}" autocomplete="tel"></div>
+      <div><label for="rp">Contraseña</label><input id="rp" type="password" required minlength="8" maxlength="64" autocomplete="new-password"></div>
+      <p class="hint">De 8 a 64 caracteres, con una mayúscula, una minúscula y un número.</p>
+      <div><label for="rp2">Repite la contraseña</label><input id="rp2" type="password" required minlength="8" maxlength="64" autocomplete="new-password"></div>
+      <div class="err" id="regErr" role="alert"></div>
+      <div class="acts" style="margin:0"><button class="btn" id="regGo">Crear cuenta</button><button class="btn line" type="button" data-close>Cancelar</button></div>
+    </form>
+  </div>
+</dialog>
+
+<!-- Formulario de libro -->
+<dialog class="modal" id="formD" aria-labelledby="ft">
+  <div class="in">
+    <h2 id="ft" style="margin-bottom:16px">Nuevo libro</h2>
+    <form class="f" id="bf">
+      <div class="full"><label for="titulo">Título *</label><input type="text" id="titulo" name="titulo" required maxlength="150"></div>
+      <div><label for="isbn">ISBN (13 dígitos) *</label><input type="text" id="isbn" name="isbn" required pattern="\d{13}" inputmode="numeric"></div>
+      <div><label for="anio">Año de publicación *</label><input type="number" id="anio" name="anio_publicacion" required min="1450" max="2026"></div>
+      <div class="row"><div><label for="autor">Autor *</label><select id="autor" name="autor_id" required></select></div><button type="button" class="btn line" id="addAutor" title="Crear autor">Nuevo</button></div>
+      <div><label for="ej">Ejemplares *</label><input type="number" id="ej" name="ejemplares" value="1" min="1" max="50" required></div>
+      <fieldset class="full"><legend>Categorías * (hasta 5)</legend><div id="catBox"></div><button type="button" class="btn line" id="addCat" style="margin-top:6px;padding:4px 10px;font-size:13px">Crear categoría</button></fieldset>
+      <div><label for="edi">Editorial</label><input type="text" id="edi" name="editorial" maxlength="100"></div>
+      <div><label for="pag">Páginas</label><input type="number" id="pag" name="num_paginas" min="1"></div>
+      <div><label for="idi">Idioma</label><input type="text" id="idi" name="idioma" maxlength="30" value="Español"></div>
+      <div class="full"><label for="sin">Sinopsis</label><textarea id="sin" name="sinopsis" rows="4" maxlength="5000"></textarea></div>
+      <div class="full"><label for="img">Portada (JPG, PNG o WEBP, máximo 5 MB)</label><input type="file" id="img" name="imagen" accept="image/jpeg,image/png,image/webp"><img id="prev" alt="Vista previa de la portada"></div>
+      <div class="err full" id="formErr" role="alert"></div>
+      <div class="acts full" style="margin:0"><button class="btn" id="save">Guardar libro</button><button class="btn line" type="button" data-close>Cancelar</button></div>
+    </form>
+  </div>
+</dialog>
+
+<div id="toast" role="status"></div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/catalog.js"></script>
+<script src="js/detail.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
